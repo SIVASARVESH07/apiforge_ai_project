@@ -1,6 +1,6 @@
-# E-Commerce Product and Order Management API
+# Item Management API
 
-API for managing products available for sale and customer orders within an e-commerce system. It supports product catalog management, including creation, retrieval, update, and deletion of products, as well as the full lifecycle of customer orders, from creation to status updates and cancellation.
+Generated API based on requirements: design a supermarket management api...
 
 Designed and generated using **APIForge AI** multi-agent framework.
 

@@ -1,0 +1,31 @@
+[
+  {
+    "total_tests": 3,
+    "passed": 3,
+    "failed": 0,
+    "errors": 0,
+    "duration_sec": 0.784,
+    "success": true,
+    "logs": "[PASS] test_health_check (0.004s)\n[PASS] test_patients_auth_required (0.003s)\n[PASS] test_patients_crud_lifecycle (0.007s)",
+    "items": [
+      {
+        "test_name": "test_health_check",
+        "status": "PASSED",
+        "duration_sec": 0.0041,
+        "error_message": null
+      },
+      {
+        "test_name": "test_patients_auth_required",
+        "status": "PASSED",
+        "duration_sec": 0.0031,
+        "error_message": null
+      },
+      {
+        "test_name": "test_patients_crud_lifecycle",
+        "status": "PASSED",
+        "duration_sec": 0.0072,
+        "error_message": null
+      }
+    ]
+  }
+]

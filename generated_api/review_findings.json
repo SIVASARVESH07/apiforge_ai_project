@@ -1,65 +1,65 @@
 [
   {
-    "rule_id": "REST-009",
+    "rule_id": "SEC-101",
     "category": "security",
-    "severity": "warning",
-    "path": "paths./products.get",
-    "message": "Secured operation GET /products requires authentication but does not define 401 Unauthorized response.",
-    "recommendation": "Add 401 response with standard ErrorResponse schema.",
-    "suggested_patch": null
-  },
-  {
-    "rule_id": "REST-009",
-    "category": "security",
-    "severity": "warning",
-    "path": "paths./products/{id}.get",
-    "message": "Secured operation GET /products/{id} requires authentication but does not define 401 Unauthorized response.",
-    "recommendation": "Add 401 response with standard ErrorResponse schema.",
+    "severity": "critical",
+    "path": "paths./students.get",
+    "message": "The GET /students endpoint, which retrieves a list of all student records, does not specify any security requirements. This allows unauthenticated access to potentially sensitive student data.",
+    "recommendation": "Add `security` definitions to this endpoint, requiring `bearerAuth` and potentially specific authorization scopes or roles (e.g., 'admin', 'faculty') to restrict access to authorized personnel only.",
     "suggested_patch": null
   },
   {
     "rule_id": "SEC-101",
     "category": "security",
     "severity": "critical",
-    "path": "paths./products.post",
-    "message": "The 'createProduct' operation is described as requiring 'administrator privileges' but the specified security scheme 'bearerAuth' only indicates authentication, not specific roles or authorization scopes. This means any authenticated user could potentially create products, bypassing the intended access control.",
-    "recommendation": "Implement a robust authorization mechanism. This could involve defining specific OAuth2 scopes (e.g., 'admin:products:write') or integrating role-based access control (RBAC) checks, typically by inspecting claims within the JWT token provided via bearerAuth. The OpenAPI specification should reflect these required scopes/roles, for example, by adding 'scopes' to the security scheme definition or by documenting the expected JWT claims.",
+    "path": "paths./students/{id}.get",
+    "message": "The GET /students/{id} endpoint, which retrieves a single student record by ID, does not specify any security requirements. This allows unauthenticated access to individual student data.",
+    "recommendation": "Add `security` definitions to this endpoint, requiring `bearerAuth` and specific authorization scopes or roles (e.g., 'admin', 'faculty', or resource-level authorization for the student themselves) to prevent unauthorized information disclosure.",
+    "suggested_patch": null
+  },
+  {
+    "rule_id": "SEC-101",
+    "category": "security",
+    "severity": "critical",
+    "path": "paths./students/{id}.put",
+    "message": "The PUT /students/{id} endpoint, which allows updating student details, does not specify any security requirements. This allows unauthenticated modification of student records.",
+    "recommendation": "Add `security` definitions to this endpoint, requiring `bearerAuth` and specific authorization scopes or roles (e.g., 'admin', 'registrar') to ensure only authorized users can modify student records.",
+    "suggested_patch": null
+  },
+  {
+    "rule_id": "BIZ-001",
+    "category": "rest_compliance",
+    "severity": "warning",
+    "path": "paths./students.post",
+    "message": "The POST /students endpoint uses both `400 Bad Request` and `422 Unprocessable Entity` for error responses. Specifically, `400` is described as handling 'email already exists,' which is a business logic validation error typically better suited for `422`. This can lead to inconsistent client error handling.",
+    "recommendation": "Standardize error responses. Use `400 Bad Request` for syntactical errors or schema validation failures, and `422 Unprocessable Entity` for semantic or business logic validation failures (e.g., unique constraint violations like 'email already exists'). Update the description for `400` accordingly.",
     "suggested_patch": null
   },
   {
     "rule_id": "SEM-001",
-    "category": "rest_compliance",
-    "severity": "warning",
-    "path": "paths./products.get",
-    "message": "The 'listProducts' operation is described as 'Accessible to all users' but the global 'bearerAuth' security scheme applies to all operations by default. This creates a contradiction where unauthenticated users would be denied access despite the description.",
-    "recommendation": "To make this endpoint truly public, explicitly override the global security for this operation by setting `security: []` within the operation object. Alternatively, if authentication is indeed required, update the description to reflect that it's accessible to all *authenticated* users.",
+    "category": "schema_completeness",
+    "severity": "info",
+    "path": "paths./students/{id}.get.parameters",
+    "message": "The `id` path parameter is defined twice for the `GET /students/{id}` operation: once at the path level (`/students/{id}`) and again within the `get` operation itself. This is redundant and can lead to confusion or inconsistencies.",
+    "recommendation": "Remove the duplicate `id` parameter definition from the `get` operation, relying solely on the definition at the path level.",
     "suggested_patch": null
   },
   {
     "rule_id": "SEM-001",
-    "category": "rest_compliance",
+    "category": "schema_completeness",
     "severity": "warning",
-    "path": "paths./products/{id}.get",
-    "message": "The 'getProductById' operation is described as 'Accessible to all users' but the global 'bearerAuth' security scheme applies to all operations by default. This creates a contradiction where unauthenticated users would be denied access despite the description.",
-    "recommendation": "To make this endpoint truly public, explicitly override the global security for this operation by setting `security: []` within the operation object. Alternatively, if authentication is indeed required, update the description to reflect that it's accessible to all *authenticated* users.",
+    "path": "paths./students/{id}.put.responses.200",
+    "message": "The description for the `200 OK` response for the `PUT /students/{id}` operation is incomplete, being cut off abruptly.",
+    "recommendation": "Complete the description for the `200 OK` response to clearly state what is returned upon a successful update (e.g., 'Student updated successfully' or 'Returns the updated student object').",
     "suggested_patch": null
   },
   {
     "rule_id": "SEC-102",
-    "category": "information_disclosure",
-    "severity": "info",
-    "path": "components.schemas",
-    "message": "Several schemas (ProductListResponse, ProductCreate, Product, ErrorResponse) are referenced but not defined in the 'components/schemas' section. Without their definitions, it's impossible to audit for potential information disclosure risks (e.g., sensitive internal IDs, cost prices, or stack traces in error responses).",
-    "recommendation": "Provide full definitions for all referenced schemas. Ensure that 'Product' schema does not expose sensitive internal data (e.g., internal database IDs, cost prices) to unauthorized users. Verify 'ErrorResponse' schema avoids exposing stack traces or overly verbose internal error details.",
-    "suggested_patch": null
-  },
-  {
-    "rule_id": "SEM-002",
-    "category": "schema_completeness",
-    "severity": "critical",
-    "path": "paths./products/{id}.put",
-    "message": "The OpenAPI specification is truncated, specifically within the definition of the PUT /products/{id} operation. This prevents a complete audit of this endpoint for business logic, security, and idempotency guarantees.",
-    "recommendation": "Provide the complete and valid OpenAPI specification to allow for a comprehensive audit.",
+    "category": "security",
+    "severity": "warning",
+    "path": "paths./students.post",
+    "message": "While `POST /students` requires `bearerAuth`, the specification does not define specific authorization scopes or roles required to perform this operation. This implies any authenticated user might be able to create student records, which is unlikely for a sensitive operation.",
+    "recommendation": "Define and apply specific authorization scopes or roles (e.g., 'admin', 'registrar') to sensitive operations like creating student records. This typically involves defining `securitySchemes` with `flows` and `scopes` or using a custom extension for roles.",
     "suggested_patch": null
   }
 ]

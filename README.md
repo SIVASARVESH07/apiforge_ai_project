@@ -145,9 +145,7 @@ python -m apiforge.cli benchmark --suite all
 python -m apiforge.cli ui --port 8501
 ```
 
-Once launched, visit **http://localhost:8501** in your browser. The dashboard supports:
-* Generating APIs from natural language requirements with real-time agent progress.
-* Loading existing generated API folders (such as `./demo_healthcare_api`).
+Once launched, visit **http://localhost:8501** in your browser. Enter natural-language API requirements and run the multi-agent workflow to generate the design, automated review, documentation, backend, and tests with real-time progress. Each dashboard run is saved in its own timestamped folder under `./generated_projects/`. The sidebar contains workflow configuration only. The dashboard also supports:
 * Comparing pre- vs post-review OpenAPI specifications.
 * Browsing generated FastAPI models and routers.
 * Executing live sandboxed Pytest tests.
@@ -185,7 +183,6 @@ ai-project/
 │   ├── ui/
 │   │   └── dashboard.py        # Streamlit interactive dashboard
 │   └── cli.py                  # Typer terminal CLI
-├── demo_healthcare_api/        # Pre-generated, tested reference healthcare API
 ├── docs/                       # Research papers, survey, methodology
 ├── tests/                      # Automated test suite (12 unit & e2e tests)
 ├── .env                        # Local environment secrets (ignored by git)

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 import json
-import os
+import re
+from datetime import datetime
+from uuid import uuid4
 import streamlit as st
 try:
     import pandas as pd
@@ -10,9 +12,7 @@ except ImportError:
     pd = None
 from apiforge.core.llm import get_llm_client
 from apiforge.core.orchestrator import APIForgeOrchestrator
-from apiforge.core.state import APIForgeState, ReviewFinding, EvaluationMetricsModel, AgentTrace, TestExecutionReport
-from apiforge.evaluation.benchmark_runner import BENCHMARK_DATASETS, BenchmarkRunner
-from apiforge.agents.review_agent.scoring import calculate_quality_score
+from apiforge.evaluation.benchmark_runner import BenchmarkRunner
 from apiforge.agents.testing_agent.sandbox_runner import SandboxRunner
 
 st.set_page_config(
@@ -26,98 +26,6 @@ st.title("⚡ APIForge AI")
 st.caption("A Multi-Agent Framework for Intelligent API Design, Automated Review, Documentation, and Testing")
 
 
-def load_project_from_dir(dir_path: str) -> APIForgeState | None:
-    """Reconstructs APIForgeState from an existing generated project directory."""
-    if not os.path.exists(dir_path):
-        return None
-    oas_path = os.path.join(dir_path, "openapi.json")
-    if not os.path.exists(oas_path):
-        return None
-
-    with open(oas_path, "r", encoding="utf-8") as f:
-        oas = json.load(f)
-
-    metrics = None
-    metrics_path = os.path.join(dir_path, "evaluation_metrics.json")
-    if os.path.exists(metrics_path):
-        with open(metrics_path, "r", encoding="utf-8") as f:
-            metrics = EvaluationMetricsModel.model_validate(json.load(f))
-
-    findings = []
-    findings_path = os.path.join(dir_path, "review_findings.json")
-    if os.path.exists(findings_path):
-        with open(findings_path, "r", encoding="utf-8") as f:
-            findings = [ReviewFinding.model_validate(x) for x in json.load(f)]
-            
-    test_reports = []
-    tests_path = os.path.join(dir_path, "test_reports.json")
-    if os.path.exists(tests_path):
-        with open(tests_path, "r", encoding="utf-8") as f:
-            test_reports = [TestExecutionReport.model_validate(x) for x in json.load(f)]
-            
-    traces = []
-    traces_path = os.path.join(dir_path, "traces.json")
-    if os.path.exists(traces_path):
-        with open(traces_path, "r", encoding="utf-8") as f:
-            traces = [AgentTrace.model_validate(x) for x in json.load(f)]
-
-    code_files = {}
-    app_dir = os.path.join(dir_path, "app")
-    if os.path.exists(app_dir):
-        for root, _, files in os.walk(app_dir):
-            for file in files:
-                if not file.endswith((".py", ".json", ".yaml", ".yml", ".md", ".txt", ".html")):
-                    continue
-                full_p = os.path.join(root, file)
-                rel_p = os.path.relpath(full_p, dir_path).replace("\\", "/")
-                with open(full_p, "r", encoding="utf-8", errors="ignore") as f:
-                    code_files[rel_p] = f.read()
-
-    test_files = {}
-    tests_dir = os.path.join(dir_path, "tests")
-    if os.path.exists(tests_dir):
-        for root, _, files in os.walk(tests_dir):
-            for file in files:
-                if not file.endswith((".py", ".json", ".yaml", ".yml", ".md", ".txt", ".html")):
-                    continue
-                full_p = os.path.join(root, file)
-                rel_p = os.path.relpath(full_p, dir_path).replace("\\", "/")
-                with open(full_p, "r", encoding="utf-8", errors="ignore") as f:
-                    test_files[rel_p] = f.read()
-
-    doc_files = {}
-    docs_dir = os.path.join(dir_path, "docs")
-    if os.path.exists(docs_dir):
-        for root, _, files in os.walk(docs_dir):
-            for file in files:
-                if not file.endswith((".py", ".json", ".yaml", ".yml", ".md", ".txt", ".html")):
-                    continue
-                full_p = os.path.join(root, file)
-                with open(full_p, "r", encoding="utf-8", errors="ignore") as f:
-                    doc_files[file] = f.read()
-    readme_path = os.path.join(dir_path, "README.md")
-    if os.path.exists(readme_path):
-        with open(readme_path, "r", encoding="utf-8") as f:
-            doc_files["README.md"] = f.read()
-
-    q_score = calculate_quality_score(findings, oas)
-
-    return APIForgeState(
-        raw_requirements=oas.get("info", {}).get("description", "Loaded from existing project directory"),
-        openapi_spec=oas,
-        review_findings=findings,
-        test_reports=test_reports,
-        traces=traces,
-        quality_scores=[q_score],
-        generated_code_files=code_files,
-        test_code_files=test_files,
-        documentation_files=doc_files,
-        evaluation_metrics=metrics,
-        status="completed"
-    )
-
-
-
 # Sidebar Configuration
 st.sidebar.header("Configuration")
 provider = st.sidebar.selectbox("LLM Provider", ["auto", "gemini", "openai", "mock"], index=0)
@@ -125,70 +33,9 @@ max_review_iters = st.sidebar.slider("Max Review Iterations", 1, 5, 3)
 max_debug_iters = st.sidebar.slider("Max Debug Iterations", 1, 5, 3)
 pass_threshold = st.sidebar.slider("Review Pass Threshold", 60, 95, 80)
 
-# Preset Templates
-preset_choice = st.sidebar.selectbox(
-    "Load Preset Requirement",
-    ["Custom"] + list(BENCHMARK_DATASETS.keys()),
-    index=0
-)
-
-# Load existing project section in sidebar
-st.sidebar.divider()
-st.sidebar.subheader("📂 Select Project Folder")
-
-# Auto-detect directories containing openapi.json
-detected_folders = []
-for item in os.listdir("."):
-    full_path = os.path.join(".", item)
-    if os.path.isdir(full_path) and os.path.exists(os.path.join(full_path, "openapi.json")):
-        detected_folders.append(f"./{item}")
-
-if not detected_folders:
-    detected_folders = ["./demo_healthcare_api"]
-
-selected_folder = st.sidebar.selectbox(
-    "Available API Project Folders:",
-    options=detected_folders,
-    index=0,
-)
-
-if st.sidebar.button("📂 Load Selected Folder", width='stretch'):
-    loaded_state = load_project_from_dir(selected_folder)
-    if loaded_state:
-        st.session_state.pipeline_state = loaded_state
-        st.sidebar.success(f"✓ Loaded: {selected_folder}")
-    else:
-        st.sidebar.error("Could not load selected directory.")
-
-# Native Windows File Explorer Folder Picker
-try:
-    import tkinter as tk
-    from tkinter import filedialog
-    HAS_TK = True
-except Exception:
-    HAS_TK = False
-
-if HAS_TK:
-    if st.sidebar.button("🖥️ Browse Folder in Windows...", width='stretch'):
-        root = tk.Tk()
-        root.withdraw()
-        root.wm_attributes("-topmost", 1)
-        folder_path = filedialog.askdirectory()
-        root.destroy()
-        if folder_path:
-            loaded_state = load_project_from_dir(folder_path)
-            if loaded_state:
-                st.session_state.pipeline_state = loaded_state
-                st.sidebar.success(f"✓ Loaded: {os.path.basename(folder_path)}")
-            else:
-                st.sidebar.error("Selected directory does not contain valid openapi.json")
-
-# Auto-load demo healthcare API on initial launch if nothing in session state
+# Start with an empty workspace so users begin with their own requirements.
 if "pipeline_state" not in st.session_state or st.session_state.pipeline_state is None:
-    if os.path.exists("./demo_healthcare_api/openapi.json"):
-        st.session_state.pipeline_state = load_project_from_dir("./demo_healthcare_api")
-    else:
-        st.session_state.pipeline_state = None
+    st.session_state.pipeline_state = None
 
 if "benchmark_results" not in st.session_state:
     st.session_state.benchmark_results = None
@@ -207,14 +54,20 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
 # ----------------- Tab 1: Workflow Runner & Spec -----------------
 with tab1:
     st.subheader("1. Requirements & Generation")
-    default_text = BENCHMARK_DATASETS.get(preset_choice, "Design a Healthcare Clinic Patient and Appointment Management API.")
-    req_input = st.text_area("Enter natural language requirements:", value=default_text, height=140)
+    req_input = st.text_area(
+        "Describe the API you want to build:",
+        placeholder="Example: Build a library API for managing books, members, and loans. Members can search books, borrow available copies, renew loans, and return books. Require authentication for member actions and include validation and error responses.",
+        height=180,
+    )
 
     col_btn, col_info = st.columns([1, 4])
     with col_btn:
-        run_button = st.button("▶ Run Multi-Agent Pipeline", type="primary", width='stretch')
+        run_button = st.button("▶ Design API and Generate Everything", type="primary", width='stretch')
 
     if run_button:
+        if not req_input.strip():
+            st.warning("Describe the API requirements above before starting the workflow.")
+            st.stop()
         st.info("Executing multi-agent workflow...")
         progress_bar = st.progress(0)
         status_text = st.empty()
@@ -244,16 +97,19 @@ with tab1:
                     break
             status_text.text(f"Agent Action: {msg}")
 
+        project_slug = re.sub(r"[^a-z0-9]+", "-", req_input.lower()).strip("-")[:40] or "api"
+        run_id = f"{datetime.now().strftime('%Y%m%d-%H%M%S')}-{uuid4().hex[:6]}"
+        output_dir = f"./generated_projects/{project_slug}-{run_id}"
         state = orchestrator.run(
             requirements=req_input,
-            output_dir="./generated_api",
+            output_dir=output_dir,
             on_step_callback=on_step,
         )
 
         progress_bar.progress(100)
         status_text.text("Workflow finished successfully!")
         st.session_state.pipeline_state = state
-        st.success("Artifacts generated and verified successfully!")
+        st.success(f"Artifacts generated and verified successfully! Saved to `{output_dir}`.")
 
     # Display Current Spec
     state = st.session_state.pipeline_state
@@ -359,7 +215,7 @@ with tab2:
                 st.write("**Final Refined Specification (Endpoints)**")
                 st.json(list(state.openapi_spec.get("paths", {}).keys()))
     else:
-        st.info("Run the pipeline in Tab 1 or load an existing project from the sidebar.")
+        st.info("Describe your API requirements above and run the multi-agent workflow to generate the design and artifacts.")
 
 # ----------------- Tab 3: Generated Code -----------------
 with tab3:
@@ -371,7 +227,7 @@ with tab3:
         code_content = all_files[selected_file]
         st.code(code_content, language="python" if selected_file.endswith(".py") else "text")
     else:
-        st.info("No generated code files loaded. Run the pipeline in Tab 1 or load a project directory.")
+        st.info("Run the multi-agent workflow to generate backend code and tests from your requirements.")
 
 # ----------------- Tab 4: Test Execution -----------------
 with tab4:
@@ -408,7 +264,7 @@ with tab4:
             st.write("#### Sandbox Console Logs")
             st.text_area("Console Output", latest_report.logs, height=200)
     else:
-        st.info("No test files available. Load a project or run the pipeline first.")
+        st.info("No test files available. Run the multi-agent workflow first.")
 
 # ----------------- Tab 5: Research Metrics -----------------
 with tab5:

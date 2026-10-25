@@ -1,0 +1,67 @@
+[
+  {
+    "total_tests": 9,
+    "passed": 9,
+    "failed": 0,
+    "errors": 0,
+    "duration_sec": 1.082,
+    "success": true,
+    "logs": "[PASS] test_customers_auth_required (0.003s)\n[PASS] test_customers_crud_lifecycle (0.012s)\n[PASS] test_health_check (0.012s)\n[PASS] test_orders_auth_required (0.009s)\n[PASS] test_orders_crud_lifecycle (0.011s)\n[PASS] test_products_auth_required (0.004s)\n[PASS] test_products_crud_lifecycle (0.009s)\n[PASS] test_users_auth_required (0.005s)\n[PASS] test_users_crud_lifecycle (0.008s)",
+    "items": [
+      {
+        "test_name": "test_customers_auth_required",
+        "status": "PASSED",
+        "duration_sec": 0.0035,
+        "error_message": null
+      },
+      {
+        "test_name": "test_customers_crud_lifecycle",
+        "status": "PASSED",
+        "duration_sec": 0.0116,
+        "error_message": null
+      },
+      {
+        "test_name": "test_health_check",
+        "status": "PASSED",
+        "duration_sec": 0.012,
+        "error_message": null
+      },
+      {
+        "test_name": "test_orders_auth_required",
+        "status": "PASSED",
+        "duration_sec": 0.0089,
+        "error_message": null
+      },
+      {
+        "test_name": "test_orders_crud_lifecycle",
+        "status": "PASSED",
+        "duration_sec": 0.0112,
+        "error_message": null
+      },
+      {
+        "test_name": "test_products_auth_required",
+        "status": "PASSED",
+        "duration_sec": 0.0036,
+        "error_message": null
+      },
+      {
+        "test_name": "test_products_crud_lifecycle",
+        "status": "PASSED",
+        "duration_sec": 0.0089,
+        "error_message": null
+      },
+      {
+        "test_name": "test_users_auth_required",
+        "status": "PASSED",
+        "duration_sec": 0.0055,
+        "error_message": null
+      },
+      {
+        "test_name": "test_users_crud_lifecycle",
+        "status": "PASSED",
+        "duration_sec": 0.0081,
+        "error_message": null
+      }
+    ]
+  }
+]

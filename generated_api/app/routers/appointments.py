@@ -8,18 +8,45 @@ from app.database import db
 router = APIRouter(prefix="", tags=["Appointments"])
 
 @router.post("/appointments", status_code=201)
-async def post_appointments(payload: AppointmentCreate, authorization: Optional[str] = Header(None)):
+async def post_appointments(payload: dict, authorization: Optional[str] = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid bearer token")
     data = payload.model_dump() if hasattr(payload, "model_dump") else dict(payload)
     created = db.create("appointments", data)
     return created
 
-@router.delete("/appointments/{appointment_id}", status_code=204)
-async def delete_appointments_appointment_id(appointment_id: str, authorization: Optional[str] = Header(None)):
+@router.get("/appointments", status_code=200)
+async def get_appointments(limit: int = Query(20, ge=1, le=100), offset: int = Query(0, ge=0), authorization: Optional[str] = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid bearer token")
-    deleted = db.delete("appointments", appointment_id)
+    items = db.list_all("appointments", limit=limit, offset=offset)
+    total = len(db.get_table("appointments"))
+    return {"items": items, "total": total, "limit": limit, "offset": offset}
+
+@router.get("/appointments/{id}", status_code=200)
+async def get_appointments_id(id: str, authorization: Optional[str] = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid bearer token")
+    item = db.get_by_id("appointments", id)
+    if not item:
+        raise HTTPException(status_code=404, detail="appointments not found")
+    return item
+
+@router.patch("/appointments/{id}", status_code=200)
+async def patch_appointments_id(id: str, payload: dict, authorization: Optional[str] = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid bearer token")
+    data = payload.model_dump(exclude_unset=True) if hasattr(payload, "model_dump") else dict(payload)
+    updated = db.update("appointments", id, data)
+    if not updated:
+        raise HTTPException(status_code=404, detail="appointments not found")
+    return updated
+
+@router.delete("/appointments/{id}", status_code=204)
+async def delete_appointments_id(id: str, authorization: Optional[str] = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid bearer token")
+    deleted = db.delete("appointments", id)
     if not deleted:
         raise HTTPException(status_code=404, detail="appointments not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -7,6 +7,14 @@ from app.database import db
 
 router = APIRouter(prefix="", tags=["Patients"])
 
+@router.post("/patients", status_code=201)
+async def post_patients(payload: dict, authorization: Optional[str] = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid bearer token")
+    data = payload.model_dump() if hasattr(payload, "model_dump") else dict(payload)
+    created = db.create("patients", data)
+    return created
+
 @router.get("/patients", status_code=200)
 async def get_patients(limit: int = Query(20, ge=1, le=100), offset: int = Query(0, ge=0), authorization: Optional[str] = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
@@ -15,28 +23,30 @@ async def get_patients(limit: int = Query(20, ge=1, le=100), offset: int = Query
     total = len(db.get_table("patients"))
     return {"items": items, "total": total, "limit": limit, "offset": offset}
 
-@router.post("/patients", status_code=201)
-async def post_patients(payload: PatientCreate, authorization: Optional[str] = Header(None)):
+@router.get("/patients/{id}", status_code=200)
+async def get_patients_id(id: str, authorization: Optional[str] = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid bearer token")
-    data = payload.model_dump() if hasattr(payload, "model_dump") else dict(payload)
-    created = db.create("patients", data)
-    return created
-
-@router.get("/patients/{patient_id}", status_code=200)
-async def get_patients_patient_id(patient_id: str, authorization: Optional[str] = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Missing or invalid bearer token")
-    item = db.get_by_id("patients", patient_id)
+    item = db.get_by_id("patients", id)
     if not item:
         raise HTTPException(status_code=404, detail="patients not found")
     return item
 
-@router.delete("/patients/{patient_id}", status_code=204)
-async def delete_patients_patient_id(patient_id: str, authorization: Optional[str] = Header(None)):
+@router.patch("/patients/{id}", status_code=200)
+async def patch_patients_id(id: str, payload: dict, authorization: Optional[str] = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid bearer token")
-    deleted = db.delete("patients", patient_id)
+    data = payload.model_dump(exclude_unset=True) if hasattr(payload, "model_dump") else dict(payload)
+    updated = db.update("patients", id, data)
+    if not updated:
+        raise HTTPException(status_code=404, detail="patients not found")
+    return updated
+
+@router.delete("/patients/{id}", status_code=204)
+async def delete_patients_id(id: str, authorization: Optional[str] = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid bearer token")
+    deleted = db.delete("patients", id)
     if not deleted:
         raise HTTPException(status_code=404, detail="patients not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>E-Commerce Product and Order Management API - API Reference</title>
+  <title>Item Management API - API Reference</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
@@ -16,9 +16,9 @@
     const spec = {
   "openapi": "3.1.0",
   "info": {
-    "title": "E-Commerce Product and Order Management API",
+    "title": "Item Management API",
     "version": "1.0.0",
-    "description": "API for managing products available for sale and customer orders within an e-commerce system. It supports product catalog management, including creation, retrieval, update, and deletion of products, as well as the full lifecycle of customer orders, from creation to status updates and cancellation."
+    "description": "Generated API based on requirements: design a supermarket management api..."
   },
   "servers": [
     {
@@ -27,13 +27,13 @@
     }
   ],
   "paths": {
-    "/products": {
+    "/items": {
       "get": {
-        "operationId": "get_products",
-        "summary": "Retrieve a list of all products",
-        "description": "Returns a paginated list of all available products in the catalog. Supports filtering and sorting.",
+        "operationId": "get_items",
+        "summary": "List all items",
+        "description": "List all items",
         "tags": [
-          "Products"
+          "Items"
         ],
         "parameters": [
           {
@@ -66,7 +66,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductListResponse"
+                  "$ref": "#/components/schemas/ItemListResponse"
                 }
               }
             }
@@ -99,11 +99,11 @@
         ]
       },
       "post": {
-        "operationId": "post_products",
-        "summary": "Create a new product",
-        "description": "Adds a new product to the catalog. Requires product details such as name, description, price, and initial stock quantity. Only authorized users can perform this action.",
+        "operationId": "post_items",
+        "summary": "Create a new item",
+        "description": "Create a new item",
         "tags": [
-          "Products"
+          "Items"
         ],
         "parameters": [],
         "responses": {
@@ -112,7 +112,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductResponse"
+                  "$ref": "#/components/schemas/ItemResponse"
                 }
               }
             }
@@ -149,27 +149,27 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ProductCreate"
+                "$ref": "#/components/schemas/ItemCreate"
               }
             }
           }
         }
       }
     },
-    "/products/{id}": {
+    "/items/{item_id}": {
       "get": {
-        "operationId": "get_products_id",
-        "summary": "Retrieve a single product by ID",
-        "description": "Returns the details of a specific product identified by its unique ID.",
+        "operationId": "get_items_item_id",
+        "summary": "Get item by ID",
+        "description": "Get item by ID",
         "tags": [
-          "Products"
+          "Items"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "item_id",
             "in": "path",
             "required": true,
-            "description": "Unique identifier for id",
+            "description": "Unique identifier for item_id",
             "schema": {
               "type": "string"
             }
@@ -181,7 +181,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductResponse"
+                  "$ref": "#/components/schemas/ItemResponse"
                 }
               }
             }
@@ -222,507 +222,20 @@
             "bearerAuth": []
           }
         ]
-      },
-      "put": {
-        "operationId": "put_products_id",
-        "summary": "Update an existing product",
-        "description": "Updates all details of an existing product identified by its ID. All fields in the request body are required for a full replacement. Only authorized users can perform this action.",
-        "tags": [
-          "Products"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for id",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProductResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request / Validation Failure",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized / Missing Token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "description": "Payload data",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProductUpdate"
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "operationId": "patch_products_id",
-        "summary": "Partially update an existing product",
-        "description": "Updates specific fields of an existing product identified by its ID. Only the fields provided in the request body will be updated. Only authorized users can perform this action.",
-        "tags": [
-          "Products"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for id",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProductResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request / Validation Failure",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized / Missing Token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "description": "Payload data",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProductUpdate"
-              }
-            }
-          }
-        }
       },
       "delete": {
-        "operationId": "delete_products_id",
-        "summary": "Delete a product",
-        "description": "Removes a product from the catalog. This operation might be restricted if the product is part of existing orders. Only authorized users can perform this action.",
+        "operationId": "delete_items_item_id",
+        "summary": "Delete a item",
+        "description": "Delete a item",
         "tags": [
-          "Products"
+          "Items"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "item_id",
             "in": "path",
             "required": true,
-            "description": "Unique identifier for id",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Resource deleted successfully"
-          },
-          "400": {
-            "description": "Bad Request / Validation Failure",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized / Missing Token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/orders": {
-      "get": {
-        "operationId": "get_orders",
-        "summary": "Retrieve a list of all orders",
-        "description": "Returns a paginated list of all customer orders. Can be filtered by customer ID or status. Only authorized users (e.g., admins) can view all orders; customers can only view their own.",
-        "tags": [
-          "Orders"
-        ],
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "description": "Maximum number of records to return",
-            "schema": {
-              "type": "integer",
-              "default": 20,
-              "minimum": 1,
-              "maximum": 100
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "description": "Number of records to skip for pagination",
-            "schema": {
-              "type": "integer",
-              "default": 0,
-              "minimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrderListResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request / Validation Failure",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized / Missing Token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      },
-      "post": {
-        "operationId": "post_orders",
-        "summary": "Create a new order",
-        "description": "Creates a new customer order with specified products and quantities. This operation validates product availability, decrements stock quantities, and calculates the total amount.",
-        "tags": [
-          "Orders"
-        ],
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": "Resource created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrderResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request / Validation Failure",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized / Missing Token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "description": "Payload data",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrderCreate"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/orders/{id}": {
-      "get": {
-        "operationId": "get_orders_id",
-        "summary": "Retrieve a single order by ID",
-        "description": "Returns the details of a specific order, including its line items. Access is restricted to the order's customer or authorized personnel.",
-        "tags": [
-          "Orders"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for id",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrderResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request / Validation Failure",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized / Missing Token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      },
-      "patch": {
-        "operationId": "patch_orders_id",
-        "summary": "Update an order's status",
-        "description": "Allows updating the status of an existing order (e.g., from 'pending' to 'shipped' or 'delivered'). This operation might trigger further business logic like stock replenishment if cancelled. Only authorized users can perform this action.",
-        "tags": [
-          "Orders"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for id",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrderResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request / Validation Failure",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized / Missing Token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "description": "Payload data",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrderStatusUpdate"
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "operationId": "delete_orders_id",
-        "summary": "Cancel an order",
-        "description": "Marks an order as 'cancelled'. This operation should trigger stock replenishment for the items in the order, provided the order has not been shipped or delivered. Only authorized users or the customer (within a certain timeframe) can perform this action.",
-        "tags": [
-          "Orders"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for id",
+            "description": "Unique identifier for item_id",
             "schema": {
               "type": "string"
             }
@@ -802,12 +315,12 @@
           "code": "sample_code"
         }
       },
-      "Product": {
+      "Item": {
         "type": "object",
-        "description": "Represents an item available for sale in the e-commerce catalog.",
+        "description": "Represents a item record",
         "required": [
           "id",
-          "name"
+          "title"
         ],
         "properties": {
           "id": {
@@ -815,28 +328,15 @@
             "format": "uuid",
             "example": "123e4567-e89b-12d3-a456-426614174000"
           },
-          "name": {
+          "title": {
             "type": "string",
-            "example": "Sample name"
+            "example": "Sample title"
           },
-          "description": {
+          "status": {
             "type": "string",
-            "example": "Sample description"
+            "example": "Sample status"
           },
-          "price": {
-            "type": "string",
-            "example": "Sample price"
-          },
-          "stockQuantity": {
-            "type": "integer",
-            "example": 1
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "updatedAt": {
+          "created_at": {
             "type": "string",
             "format": "date-time",
             "example": "2026-01-01T12:00:00Z"
@@ -844,100 +344,53 @@
         },
         "example": {
           "id": "123e4567-e89b-12d3-a456-426614174000",
-          "name": "Sample name",
-          "description": "Sample description",
-          "price": "Sample price",
-          "stockQuantity": 1,
-          "createdAt": "2026-01-01T12:00:00Z",
-          "updatedAt": "2026-01-01T12:00:00Z"
+          "title": "Sample title",
+          "status": "Sample status",
+          "created_at": "2026-01-01T12:00:00Z"
         }
       },
-      "ProductCreate": {
+      "ItemCreate": {
         "type": "object",
-        "description": "Payload for creating a new Product",
+        "description": "Payload for creating a new Item",
         "required": [
-          "name"
+          "title"
         ],
         "properties": {
-          "name": {
+          "title": {
             "type": "string",
-            "example": "Sample name"
+            "example": "Sample title"
           },
-          "description": {
+          "status": {
             "type": "string",
-            "example": "Sample description"
-          },
-          "price": {
-            "type": "string",
-            "example": "Sample price"
-          },
-          "stockQuantity": {
-            "type": "integer",
-            "example": 1
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
+            "example": "Sample status"
           }
         },
         "example": {
-          "name": "Sample name",
-          "description": "Sample description",
-          "price": "Sample price",
-          "stockQuantity": 1,
-          "createdAt": "2026-01-01T12:00:00Z",
-          "updatedAt": "2026-01-01T12:00:00Z"
+          "title": "Sample title",
+          "status": "Sample status"
         }
       },
-      "ProductUpdate": {
+      "ItemUpdate": {
         "type": "object",
-        "description": "Payload for updating an existing Product",
+        "description": "Payload for updating an existing Item",
         "properties": {
-          "name": {
+          "title": {
             "type": "string",
-            "example": "Sample name"
+            "example": "Sample title"
           },
-          "description": {
+          "status": {
             "type": "string",
-            "example": "Sample description"
-          },
-          "price": {
-            "type": "string",
-            "example": "Sample price"
-          },
-          "stockQuantity": {
-            "type": "integer",
-            "example": 1
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
+            "example": "Sample status"
           }
         },
         "example": {
-          "name": "Sample name",
-          "description": "Sample description",
-          "price": "Sample price",
-          "stockQuantity": 1,
-          "createdAt": "2026-01-01T12:00:00Z",
-          "updatedAt": "2026-01-01T12:00:00Z"
+          "title": "Sample title",
+          "status": "Sample status"
         }
       },
-      "ProductListResponse": {
+      "ItemListResponse": {
         "type": "object",
-        "description": "Paginated list of Product records",
+        "description": "Paginated list of Item records",
         "required": [
           "items",
           "total",
@@ -948,353 +401,7 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Product"
-            },
-            "example": []
-          },
-          "total": {
-            "type": "integer",
-            "example": 100
-          },
-          "limit": {
-            "type": "integer",
-            "example": 20
-          },
-          "offset": {
-            "type": "integer",
-            "example": 0
-          }
-        },
-        "example": {
-          "items": [],
-          "total": 100,
-          "limit": 20,
-          "offset": 0
-        }
-      },
-      "Order": {
-        "type": "object",
-        "description": "Represents a customer's purchase, containing one or more order items.",
-        "required": [
-          "id"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "customerId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "orderDate": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "status": {
-            "type": "string",
-            "example": "Sample status"
-          },
-          "totalAmount": {
-            "type": "string",
-            "example": "Sample totalAmount"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          }
-        },
-        "example": {
-          "id": "123e4567-e89b-12d3-a456-426614174000",
-          "customerId": "123e4567-e89b-12d3-a456-426614174000",
-          "orderDate": "2026-01-01T12:00:00Z",
-          "status": "Sample status",
-          "totalAmount": "Sample totalAmount",
-          "createdAt": "2026-01-01T12:00:00Z",
-          "updatedAt": "2026-01-01T12:00:00Z"
-        }
-      },
-      "OrderCreate": {
-        "type": "object",
-        "description": "Payload for creating a new Order",
-        "required": [],
-        "properties": {
-          "customerId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "orderDate": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "status": {
-            "type": "string",
-            "example": "Sample status"
-          },
-          "totalAmount": {
-            "type": "string",
-            "example": "Sample totalAmount"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          }
-        },
-        "example": {
-          "customerId": "123e4567-e89b-12d3-a456-426614174000",
-          "orderDate": "2026-01-01T12:00:00Z",
-          "status": "Sample status",
-          "totalAmount": "Sample totalAmount",
-          "createdAt": "2026-01-01T12:00:00Z",
-          "updatedAt": "2026-01-01T12:00:00Z"
-        }
-      },
-      "OrderUpdate": {
-        "type": "object",
-        "description": "Payload for updating an existing Order",
-        "properties": {
-          "customerId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "orderDate": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "status": {
-            "type": "string",
-            "example": "Sample status"
-          },
-          "totalAmount": {
-            "type": "string",
-            "example": "Sample totalAmount"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          }
-        },
-        "example": {
-          "customerId": "123e4567-e89b-12d3-a456-426614174000",
-          "orderDate": "2026-01-01T12:00:00Z",
-          "status": "Sample status",
-          "totalAmount": "Sample totalAmount",
-          "createdAt": "2026-01-01T12:00:00Z",
-          "updatedAt": "2026-01-01T12:00:00Z"
-        }
-      },
-      "OrderListResponse": {
-        "type": "object",
-        "description": "Paginated list of Order records",
-        "required": [
-          "items",
-          "total",
-          "limit",
-          "offset"
-        ],
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Order"
-            },
-            "example": []
-          },
-          "total": {
-            "type": "integer",
-            "example": 100
-          },
-          "limit": {
-            "type": "integer",
-            "example": 20
-          },
-          "offset": {
-            "type": "integer",
-            "example": 0
-          }
-        },
-        "example": {
-          "items": [],
-          "total": 100,
-          "limit": 20,
-          "offset": 0
-        }
-      },
-      "OrderItem": {
-        "type": "object",
-        "description": "Represents a single line item within an order, linking to a product and specifying quantity and price at the time of order.",
-        "required": [
-          "id"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "orderId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "quantity": {
-            "type": "integer",
-            "example": 1
-          },
-          "priceAtOrder": {
-            "type": "string",
-            "example": "Sample priceAtOrder"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          }
-        },
-        "example": {
-          "id": "123e4567-e89b-12d3-a456-426614174000",
-          "orderId": "123e4567-e89b-12d3-a456-426614174000",
-          "productId": "123e4567-e89b-12d3-a456-426614174000",
-          "quantity": 1,
-          "priceAtOrder": "Sample priceAtOrder",
-          "createdAt": "2026-01-01T12:00:00Z",
-          "updatedAt": "2026-01-01T12:00:00Z"
-        }
-      },
-      "OrderItemCreate": {
-        "type": "object",
-        "description": "Payload for creating a new OrderItem",
-        "required": [],
-        "properties": {
-          "orderId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "quantity": {
-            "type": "integer",
-            "example": 1
-          },
-          "priceAtOrder": {
-            "type": "string",
-            "example": "Sample priceAtOrder"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          }
-        },
-        "example": {
-          "orderId": "123e4567-e89b-12d3-a456-426614174000",
-          "productId": "123e4567-e89b-12d3-a456-426614174000",
-          "quantity": 1,
-          "priceAtOrder": "Sample priceAtOrder",
-          "createdAt": "2026-01-01T12:00:00Z",
-          "updatedAt": "2026-01-01T12:00:00Z"
-        }
-      },
-      "OrderItemUpdate": {
-        "type": "object",
-        "description": "Payload for updating an existing OrderItem",
-        "properties": {
-          "orderId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "quantity": {
-            "type": "integer",
-            "example": 1
-          },
-          "priceAtOrder": {
-            "type": "string",
-            "example": "Sample priceAtOrder"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2026-01-01T12:00:00Z"
-          }
-        },
-        "example": {
-          "orderId": "123e4567-e89b-12d3-a456-426614174000",
-          "productId": "123e4567-e89b-12d3-a456-426614174000",
-          "quantity": 1,
-          "priceAtOrder": "Sample priceAtOrder",
-          "createdAt": "2026-01-01T12:00:00Z",
-          "updatedAt": "2026-01-01T12:00:00Z"
-        }
-      },
-      "OrderItemListResponse": {
-        "type": "object",
-        "description": "Paginated list of OrderItem records",
-        "required": [
-          "items",
-          "total",
-          "limit",
-          "offset"
-        ],
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OrderItem"
+              "$ref": "#/components/schemas/Item"
             },
             "example": []
           },
