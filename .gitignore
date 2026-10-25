@@ -1,5 +1,5 @@
-# Byte-compiled / optimized / DLL files
 __pycache__/
+<<<<<<< HEAD
 <<<<<<< HEAD
 *.py[cod]
 *$py.class
@@ -255,3 +255,8 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 >>>>>>> 05f03a24bd41bcacd15fd5ccd4f90b8f881f8710
+=======
+.env
+*.pyc
+.venv/
+>>>>>>> 04a96fde589be59f8fc5be2c072ede207ae00be2
